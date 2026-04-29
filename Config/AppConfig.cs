@@ -66,10 +66,10 @@ public class AppConfig
 public class QBitConfig
 {
     public string Host { get; set; } = "localhost";
-    public int Port { get; set; } = 8081;
+    public int Port { get; set; } = 8080;
     public string Username { get; set; } = "admin";
-    public string Password { get; set; } = "123456";
-    public string SavePath { get; set; } = "F:\\Anime";
+    public string Password { get; set; } = "Please Enter Password";
+    public string SavePath { get; set; } = "Choose Your Savepath";
     public string Category { get; set; } = "anime";
 }
 

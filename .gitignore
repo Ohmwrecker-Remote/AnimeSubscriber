@@ -27,5 +27,9 @@ logs/*.txt
 ## Claude local settings
 .claude/settings.local.json
 
+## Release artifacts
+publish/
+*.zip
+
 ## App config with real credentials
 appsettings.Production.json

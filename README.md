@@ -33,7 +33,7 @@ Anime RSS 订阅自动下载工具 — 监控 RSS 源更新，自动匹配番剧
 {
   "qbittorrent": {
     "host": "localhost",
-    "port": 8081,
+    "port": 8080,
     "username": "admin",
     "password": "Please Enter Password",
     "savePath": "Choose Your Savepath",
@@ -49,11 +49,11 @@ Anime RSS 订阅自动下载工具 — 监控 RSS 源更新，自动匹配番剧
 | 字段 | 说明 |
 |------|------|
 | `qbittorrent.host` | qBittorrent Web UI 地址 |
-| `qbittorrent.port` | Web UI 端口（默认 8081） |
+| `qbittorrent.port` | Web UI 端口（默认 8080） |
 | `qbittorrent.savePath` | 下载保存路径 |
 | `qbittorrent.category` | qBittorrent 分类标签 |
 | `settings.rssIntervalMinutes` | 自动检查间隔（分钟） |
-| `settings.proxy` | HTTP 代理（可选，如 `http://127.0.0.1:7897`） |
+| `settings.proxy` | HTTP 代理（可选，如 `http://127.0.0.1:<Your Port>`） |
 
 ## 项目结构
 
