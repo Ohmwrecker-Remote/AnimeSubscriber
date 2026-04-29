@@ -1,0 +1,130 @@
+<UserControl x:Class="AnimeSubscriber.Views.DownloadsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:AnimeSubscriber.ViewModels"
+             xmlns:conv="clr-namespace:AnimeSubscriber.Converters"
+             Background="{StaticResource BgPrimaryBrush}">
+
+    <UserControl.Resources>
+        <conv:StatusToColorConverter x:Key="StatusToColor"/>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Border Style="{StaticResource CardPanel}" Margin="16">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" BorderBrush="{StaticResource BorderLightBrush}"
+                    BorderThickness="0,0,0,1" Padding="12,10" Margin="-12,0,-12,4">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="📥 下载状态" FontSize="{StaticResource TitleFontSize}" FontWeight="Bold"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="🗑 删除选中" Style="{StaticResource SecondaryButton}"
+                                Command="{Binding DeleteSelectedCommand}" Margin="0,0,6,0"/>
+                        <Button Content="🔄 刷新" Style="{StaticResource SuccessButton}"
+                                Command="{Binding RefreshCommand}" Margin="0,0,6,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Download DataGrid -->
+            <DataGrid Grid.Row="1" ItemsSource="{Binding Items}"
+                      AutoGenerateColumns="False" HeadersVisibility="Column"
+                      GridLinesVisibility="None" Background="Transparent"
+                      BorderThickness="0" RowHeight="36"
+                      CanUserAddRows="False" CanUserDeleteRows="False"
+                      CanUserResizeRows="False" IsReadOnly="False"
+                      Margin="-8,4,-8,0"
+                      PreviewMouseLeftButtonDown="OnDataGridMouseDown">
+                <DataGrid.Resources>
+                    <Style x:Key="CenterTextStyle" TargetType="TextBlock">
+                        <Setter Property="TextAlignment" Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="TextAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="{StaticResource BgSecondaryBrush}"/>
+                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Padding" Value="8,4"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="8,0"/>
+                        <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="选择" Width="60">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Margin="-10,0,-10,0" Padding="10,0,10,0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="番剧" Binding="{Binding AnimeName}" Width="2*" IsReadOnly="True"
+                                        ElementStyle="{StaticResource CenterTextStyle}"/>
+                    <DataGridTextColumn Header="集数" Binding="{Binding Episode}" Width="70" IsReadOnly="True"
+                                        ElementStyle="{StaticResource CenterTextStyle}"/>
+                    <DataGridTextColumn Header="字幕组" Binding="{Binding Subgroup}" Width="110" IsReadOnly="True"
+                                        ElementStyle="{StaticResource CenterTextStyle}"/>
+                    <DataGridTextColumn Header="画质" Binding="{Binding Quality}" Width="70" IsReadOnly="True"
+                                        ElementStyle="{StaticResource CenterTextStyle}"/>
+
+                    <DataGridTemplateColumn Header="进度" Width="140">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <ProgressBar Value="{Binding Progress}" Minimum="0" Maximum="100"
+                                                 Height="18" BorderThickness="0"
+                                                 Foreground="{StaticResource CoralBrush}"
+                                                 Background="{StaticResource BgSecondaryBrush}">
+                                        <ProgressBar.Template>
+                                            <ControlTemplate TargetType="ProgressBar">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        CornerRadius="9" BorderThickness="0">
+                                                    <Rectangle x:Name="PART_Indicator"
+                                                               Fill="{TemplateBinding Foreground}"
+                                                               RadiusX="9" RadiusY="9"
+                                                               HorizontalAlignment="Left"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </ProgressBar.Template>
+                                    </ProgressBar>
+                                    <TextBlock Text="{Binding Progress, StringFormat={}{0:F0}%}"
+                                               FontSize="11" HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" Foreground="Black"/>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="状态" Width="110">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding StatusText}"
+                                           Foreground="{Binding Status, Converter={StaticResource StatusToColor}}"
+                                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,77 @@
+<UserControl x:Class="AnimeSubscriber.Views.SubscriptionsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:AnimeSubscriber.ViewModels"
+             Background="{StaticResource BgPrimaryBrush}">
+
+    <Border Style="{StaticResource CardPanel}" Margin="16">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>   <!-- Header -->
+                <RowDefinition Height="Auto"/>   <!-- RSS row -->
+                <RowDefinition Height="*"/>      <!-- List -->
+                <RowDefinition Height="Auto"/>   <!-- Buttons -->
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" BorderBrush="{StaticResource BorderLightBrush}"
+                    BorderThickness="0,0,0,1" Padding="12,10" Margin="-12,0,-12,4">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="📺 订阅管理" FontSize="{StaticResource TitleFontSize}" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding Subs.Count, StringFormat='共 {0} 个订阅'}"
+                                   FontSize="{StaticResource SmallFontSize}"
+                                   Foreground="{StaticResource TextMutedBrush}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <Button Content="🔄 检查更新" Style="{StaticResource SuccessButton}"
+                            Command="{Binding CheckNowCommand}"
+                            IsEnabled="{Binding IsNotLoading}"
+                            HorizontalAlignment="Right" VerticalAlignment="Center" Width="120"/>
+                </Grid>
+            </Border>
+
+            <!-- RSS input row -->
+            <Grid Grid.Row="1" Margin="0,8,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" Text="{Binding RssUrl, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ThemedTextBox}"
+                         VerticalContentAlignment="Center"
+                         IsEnabled="{Binding IsNotLoading}"/>
+                <Button Grid.Column="1" Content="添加 RSS" Style="{StaticResource CoralButton}"
+                        Command="{Binding AddRssCommand}" Margin="6,0,0,0"
+                        IsEnabled="{Binding IsNotLoading}" Width="90"/>
+            </Grid>
+
+            <!-- Subscription list -->
+            <ListBox Grid.Row="2" ItemsSource="{Binding Subs}"
+                     SelectedItem="{Binding SelectedSub}"
+                     BorderThickness="0" Background="Transparent"
+                     Margin="-8,4,-8,4">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding DisplayText}" Padding="12,8"
+                                   FontSize="{StaticResource NormalFontSize}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Bottom buttons -->
+            <Grid Grid.Row="3" Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="✏ 手动添加" Style="{StaticResource CoralButton}"
+                        Command="{Binding AddManualCommand}" Margin="0,0,4,0"
+                        IsEnabled="{Binding IsNotLoading}"/>
+                <Button Grid.Column="1" Content="🗑 删除选中" Style="{StaticResource DangerButton}"
+                        Command="{Binding DeleteCommand}" Margin="4,0,0,0"
+                        IsEnabled="{Binding CanDelete}"/>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>
