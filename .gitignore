@@ -26,6 +26,6 @@
 !/*.resx
 !/*.cs
 !/*.xaml
-!/*.md
+!/README.md
 !/appsettings.json
 !/LICENSE
