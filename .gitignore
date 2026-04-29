@@ -1,0 +1,31 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+## VS Code / IDE
+.vs/
+.vscode/
+*.DotSettings.user
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Build
+*.exe
+*.dll
+*.pdb
+
+## Logs (runtime output, keep the directory structure but not the files)
+logs/*.txt
+
+## Claude local settings
+.claude/settings.local.json
+
+## App config with real credentials
+appsettings.Production.json

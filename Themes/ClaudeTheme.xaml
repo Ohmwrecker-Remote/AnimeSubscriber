@@ -1,0 +1,302 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  COLORS — Claude warm cream palette                        -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+    <!-- Surface -->
+    <Color x:Key="CanvasColor">#faf9f5</Color>
+    <Color x:Key="SurfaceSoftColor">#f5f0e8</Color>
+    <Color x:Key="SurfaceCardColor">#efe9de</Color>
+    <Color x:Key="WhiteWarmColor">#fffefb</Color>
+    <Color x:Key="InputBgColor">#faf9f5</Color>
+
+    <!-- Sidebar -->
+    <Color x:Key="SidebarBgColor">#181715</Color>
+    <Color x:Key="SidebarHoverColor">#252320</Color>
+    <Color x:Key="SidebarActiveColor">#1f1e1b</Color>
+    <Color x:Key="SidebarDividerColor">#2d2b27</Color>
+
+    <!-- Accent -->
+    <Color x:Key="CoralColor">#cc785c</Color>
+    <Color x:Key="CoralHoverColor">#a9583e</Color>
+    <Color x:Key="CoralActiveColor">#914830</Color>
+    <Color x:Key="SuccessColor">#5db872</Color>
+    <Color x:Key="AmberColor">#e8a55a</Color>
+    <Color x:Key="ErrorColor">#c64545</Color>
+    <Color x:Key="TealColor">#5db8a6</Color>
+
+    <!-- Text -->
+    <Color x:Key="InkColor">#141413</Color>
+    <Color x:Key="BodyColor">#3d3d3a</Color>
+    <Color x:Key="MutedColor">#6c6a64</Color>
+    <Color x:Key="OnDarkColor">#faf9f5</Color>
+    <Color x:Key="OnDarkSoftColor">#c5c0b7</Color>
+
+    <!-- Border -->
+    <Color x:Key="HairlineColor">#e6dfd8</Color>
+    <Color x:Key="HairlineSoftColor">#ebe6df</Color>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  BRUSHES                                                     -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+    <SolidColorBrush x:Key="BgPrimaryBrush" Color="{StaticResource CanvasColor}"/>
+    <SolidColorBrush x:Key="BgSecondaryBrush" Color="{StaticResource SurfaceSoftColor}"/>
+    <SolidColorBrush x:Key="BgCardBrush" Color="{StaticResource WhiteWarmColor}"/>
+    <SolidColorBrush x:Key="BgInputBrush" Color="{StaticResource InputBgColor}"/>
+    <SolidColorBrush x:Key="BgHoverBrush" Color="{StaticResource SurfaceSoftColor}"/>
+    <SolidColorBrush x:Key="BgActiveBrush" Color="{StaticResource SurfaceCardColor}"/>
+    <SolidColorBrush x:Key="BgSelectedBrush" Color="#f5ebe1"/>
+
+    <SolidColorBrush x:Key="SidebarBgBrush" Color="{StaticResource SidebarBgColor}"/>
+    <SolidColorBrush x:Key="SidebarHoverBrush" Color="{StaticResource SidebarHoverColor}"/>
+    <SolidColorBrush x:Key="SidebarActiveBrush" Color="{StaticResource SidebarActiveColor}"/>
+    <SolidColorBrush x:Key="SidebarDividerBrush" Color="{StaticResource SidebarDividerColor}"/>
+
+    <SolidColorBrush x:Key="CoralBrush" Color="{StaticResource CoralColor}"/>
+    <SolidColorBrush x:Key="CoralHoverBrush" Color="{StaticResource CoralHoverColor}"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+    <SolidColorBrush x:Key="AmberBrush" Color="{StaticResource AmberColor}"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>
+    <SolidColorBrush x:Key="TealBrush" Color="{StaticResource TealColor}"/>
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource InkColor}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource BodyColor}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource MutedColor}"/>
+    <SolidColorBrush x:Key="TextInverseBrush" Color="White"/>
+    <SolidColorBrush x:Key="OnDarkBrush" Color="{StaticResource OnDarkColor}"/>
+    <SolidColorBrush x:Key="OnDarkSoftBrush" Color="{StaticResource OnDarkSoftColor}"/>
+
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource HairlineColor}"/>
+    <SolidColorBrush x:Key="BorderLightBrush" Color="{StaticResource HairlineSoftColor}"/>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  TYPOGRAPHY                                                 -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+    <FontFamily x:Key="BodyFont">Microsoft YaHei UI</FontFamily>
+    <FontFamily x:Key="MonoFont">JetBrains Mono, Consolas, monospace</FontFamily>
+
+    <sys:Double x:Key="TitleFontSize">18</sys:Double>
+    <sys:Double x:Key="NormalFontSize">14</sys:Double>
+    <sys:Double x:Key="SmallFontSize">13</sys:Double>
+    <sys:Double x:Key="CaptionFontSize">12</sys:Double>
+    <sys:Double x:Key="NavFontSize">15</sys:Double>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  RADII & SPACING                                           -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+    <CornerRadius x:Key="CardRadius">12</CornerRadius>
+    <CornerRadius x:Key="ButtonRadius">8</CornerRadius>
+    <CornerRadius x:Key="InputRadius">8</CornerRadius>
+    <CornerRadius x:Key="BadgeRadius">4</CornerRadius>
+
+    <sys:Double x:Key="ButtonHeight">36</sys:Double>
+    <sys:Double x:Key="InputHeight">36</sys:Double>
+    <sys:Double x:Key="SidebarWidth">200</sys:Double>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  STYLES                                                     -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+    <!-- ── Primary Button (Coral) ── -->
+    <Style x:Key="CoralButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource ButtonHeight}"/>
+        <Setter Property="MinWidth" Value="72"/>
+        <Setter Property="Background" Value="{StaticResource CoralBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontFamily" Value="{StaticResource BodyFont}"/>
+        <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="16,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource ButtonRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <TextBlock Text="{TemplateBinding Content}"
+                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource CoralHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#914830"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ── Secondary Button ── -->
+    <Style x:Key="SecondaryButton" TargetType="Button">
+        <Setter Property="Height" Value="{StaticResource ButtonHeight}"/>
+        <Setter Property="MinWidth" Value="72"/>
+        <Setter Property="Background" Value="{StaticResource BgCardBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource BodyFont}"/>
+        <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="16,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource ButtonRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <TextBlock Text="{TemplateBinding Content}"
+                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource BgHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{StaticResource BgActiveBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ── Danger Button (Red) ── -->
+    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource CoralButton}">
+        <Setter Property="Background" Value="{StaticResource ErrorBrush}"/>
+    </Style>
+
+    <!-- ── Success Button (Green) ── -->
+    <Style x:Key="SuccessButton" TargetType="Button" BasedOn="{StaticResource CoralButton}">
+        <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
+    </Style>
+
+    <!-- ── Teal Button ── -->
+    <Style x:Key="TealButton" TargetType="Button" BasedOn="{StaticResource CoralButton}">
+        <Setter Property="Background" Value="{StaticResource TealBrush}"/>
+    </Style>
+
+    <!-- ── Sidebar NavButton ── -->
+    <Style x:Key="NavButton" TargetType="Button">
+        <Setter Property="Height" Value="44"/>
+        <Setter Property="Background" Value="{StaticResource SidebarBgBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource OnDarkSoftBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource BodyFont}"/>
+        <Setter Property="FontSize" Value="{StaticResource NavFontSize}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="16,0,8,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Bg" Background="Transparent"/>
+                        <Border x:Name="AccentBar"
+                                Width="4" HorizontalAlignment="Left"
+                                VerticalAlignment="Stretch"
+                                Background="Transparent"
+                                CornerRadius="0,2,2,0"
+                                Margin="0,6"/>
+                        <TextBlock Text="{TemplateBinding Content}"
+                                   Margin="{TemplateBinding Padding}"
+                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="LightGray"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ── Active NavButton ── -->
+    <Style x:Key="ActiveNavButton" TargetType="Button" BasedOn="{StaticResource NavButton}">
+        <Setter Property="Background" Value="{StaticResource SidebarActiveBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource OnDarkBrush}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="White"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ── TextBox ── -->
+    <Style x:Key="ThemedTextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource BgInputBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource BodyFont}"/>
+        <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8,3"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource InputRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ScrollViewer x:Name="PART_ContentHost"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource CoralBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ── Card ── -->
+    <Style x:Key="CardPanel" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BgCardBrush}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CardRadius}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="12"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="8" ShadowDepth="1" Opacity="0.06" Color="#141413"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  GLOBAL DEFAULTS                                            -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+
+    <Style TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource BodyFont}"/>
+        <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+
+</ResourceDictionary>

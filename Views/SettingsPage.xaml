@@ -1,0 +1,126 @@
+<UserControl x:Class="AnimeSubscriber.Views.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource BgPrimaryBrush}">
+
+    <Border Style="{StaticResource CardPanel}" Margin="16">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Header -->
+                <Border BorderBrush="{StaticResource BorderLightBrush}"
+                        BorderThickness="0,0,0,1" Padding="0,0,0,10" Margin="0,0,0,12">
+                    <TextBlock Text="⚙ 设置" FontSize="{StaticResource TitleFontSize}" FontWeight="Bold"/>
+                </Border>
+
+                <!-- qBittorrent Section -->
+                <TextBlock Text="qBittorrent 连接" FontWeight="Bold"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="{StaticResource NormalFontSize}" Margin="0,0,0,8"/>
+
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Host" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBox Grid.Column="1" Text="{Binding QbHost, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource ThemedTextBox}"/>
+                </Grid>
+
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Port" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBox Grid.Column="1" Text="{Binding QbPort, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource ThemedTextBox}"/>
+                </Grid>
+
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Username" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBox Grid.Column="1" Text="{Binding QbUser, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource ThemedTextBox}"/>
+                </Grid>
+
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Password" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBox Grid.Column="1" Text="{Binding QbPass, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource ThemedTextBox}"/>
+                </Grid>
+
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Save Path" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding QbPath, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource ThemedTextBox}"/>
+                        <Button Grid.Column="1" Content="浏览" Command="{Binding BrowsePathCommand}"
+                                Style="{StaticResource SecondaryButton}" Width="56" Margin="4,0,0,0"/>
+                    </Grid>
+                </Grid>
+
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Category" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBox Grid.Column="1" Text="{Binding QbCategory, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource ThemedTextBox}"/>
+                </Grid>
+
+                <Border BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="0,1,0,0" Margin="0,8"/>
+
+                <!-- Proxy Section -->
+                <TextBlock Text="HTTP 代理地址" FontWeight="Bold"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="{StaticResource NormalFontSize}" Margin="0,12,0,8"/>
+
+                <TextBox Text="{Binding Proxy, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ThemedTextBox}" Margin="0,0,0,12"/>
+
+                <Border BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="0,1,0,0" Margin="0,8"/>
+
+                <!-- Polling Section -->
+                <TextBlock Text="轮询设置" FontWeight="Bold"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="{StaticResource NormalFontSize}" Margin="0,12,0,8"/>
+
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="间隔(分)" VerticalAlignment="Center" Width="70"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBox Grid.Column="1" Text="{Binding Interval, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource ThemedTextBox}"/>
+                    <CheckBox Grid.Column="2" Content="自动轮询" IsChecked="{Binding AutoPoll}"
+                              VerticalAlignment="Center" Margin="16,0,0,0"
+                              Foreground="{StaticResource TextSecondaryBrush}"/>
+                </Grid>
+
+                <!-- Save Button -->
+                <Button Content="💾 保存设置" Style="{StaticResource TealButton}"
+                        Command="{Binding SaveCommand}" Width="120" Height="36"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>
