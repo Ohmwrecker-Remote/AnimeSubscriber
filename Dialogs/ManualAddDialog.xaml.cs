@@ -5,7 +5,6 @@ namespace AnimeSubscriber.Dialogs;
 public partial class ManualAddDialog : Window
 {
     public string SubName => NameBox.Text;
-    public string RssUrl => "";
 
     public ManualAddDialog(string title, string defaultName = "")
     {

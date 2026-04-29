@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
@@ -42,7 +43,6 @@ public class SubscriptionsViewModel : BaseViewModel
     public bool IsNotLoading => !Loading;
 
     public ICommand AddRssCommand { get; }
-    public ICommand AddManualCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand CheckNowCommand { get; }
 
@@ -50,7 +50,6 @@ public class SubscriptionsViewModel : BaseViewModel
     {
         _owner = owner;
         AddRssCommand = new RelayCommand(async () => await AddRssSubscription());
-        AddManualCommand = new RelayCommand(AddManualSubscription);
         DeleteCommand = new RelayCommand(DeleteSubscription, () => CanDelete);
         CheckNowCommand = new RelayCommand(async () => await CheckNowInteractive());
     }
@@ -83,16 +82,13 @@ public class SubscriptionsViewModel : BaseViewModel
         Logger.Info($"自动检查 {_owner.Config.Subscriptions.Count} 个订阅");
         Loading = true;
 
-        var sem = new SemaphoreSlim(3);
-        var tasks = _owner.Config.Subscriptions.Select(async sub =>
+        var limit = Math.Max(1, _owner.Config.Downloader.ConcurrencyLimit);
+        var opts = new ParallelOptions { MaxDegreeOfParallelism = limit };
+        await Parallel.ForEachAsync(_owner.Config.Subscriptions, opts, async (sub, _) =>
         {
-            await sem.WaitAsync();
             try { await CheckOneAndDownloadAsync(sub); }
-            catch (Exception ex) { Logger.Error($"[{sub.Name}] 检查失败", ex); }
-            finally { sem.Release(); }
+            catch (Exception ex) { Logger.Error($"[{sub.Name}] 检查失败", ex); _owner.ShowError($"检查失败: {sub.Name}"); }
         });
-
-        await Task.WhenAll(tasks);
         _owner.Config.Save(_owner.ConfigPath);
         Loading = false;
         RefreshList();
@@ -116,14 +112,21 @@ public class SubscriptionsViewModel : BaseViewModel
 
         var groups = matched.GroupBy(m => m.Parsed.Episode ?? 0).OrderBy(g => g.Key);
 
+        var newCount = 0;
         foreach (var group in groups)
         {
             var entries = group.ToList();
             if (FileScanner.GetEpisodeStatus(saveDir, group.Key) != DownloadStatus.Waiting) continue;
 
-            var (bestItem, _) = Ranker.PickBest(entries);
-            await _owner.QBit.AddTorrentAsync(bestItem.TorrentUrl, saveDir, _owner.Config.QBittorrent.Category);
+            var best = Ranker.PickBest(entries);
+            if (best == null) continue;
+            var (bestItem, _) = best.Value;
+            var ok = await _owner.QBit.AddTorrentAsync(bestItem.TorrentUrl, saveDir, _owner.Config.QBittorrent.Category);
+            if (ok) newCount++;
         }
+
+        if (newCount > 0)
+            NotificationService.Show("RSS 更新", $"[{sub.Name}] 发现 {newCount} 个新剧集，已推送到下载队列");
     }
 
     // ── Interactive check (with episode selector) ──
@@ -185,24 +188,21 @@ public class SubscriptionsViewModel : BaseViewModel
 
     private async Task<List<MatchedEpisode>> FetchAllSubscriptionsAsync()
     {
-        var allMatches = new List<MatchedEpisode>();
-        var sem = new SemaphoreSlim(3);
-        var lockObj = new object();
+        var allMatches = new ConcurrentBag<MatchedEpisode>();
+        var limit = Math.Max(1, _owner.Config.Downloader.ConcurrencyLimit);
+        var opts = new ParallelOptions { MaxDegreeOfParallelism = limit };
 
-        var tasks = _owner.Config.Subscriptions.Select(async sub =>
+        await Parallel.ForEachAsync(_owner.Config.Subscriptions, opts, async (sub, _) =>
         {
-            await sem.WaitAsync();
             try
             {
                 var results = await FetchOneAsync(sub);
-                lock (lockObj) allMatches.AddRange(results);
+                foreach (var r in results) allMatches.Add(r);
             }
-            catch (Exception ex) { Logger.Error($"[{sub.Name}] 检查失败", ex); }
-            finally { sem.Release(); }
+            catch (Exception ex) { Logger.Error($"[{sub.Name}] 检查失败", ex); _owner.ShowError($"检查失败: {sub.Name}"); }
         });
 
-        await Task.WhenAll(tasks);
-        return allMatches;
+        return allMatches.ToList();
     }
 
     private async Task<List<MatchedEpisode>> FetchOneAsync(Subscription sub)
@@ -324,24 +324,6 @@ public class SubscriptionsViewModel : BaseViewModel
         Loading = false;
         RefreshList();
         MessageBox.Show($"已添加 {epDialog.SelectedEntries.Count} 集到下载队列", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
-    }
-
-    private void AddManualSubscription()
-    {
-        var dialog = new ManualAddDialog("手动添加订阅");
-        dialog.Owner = Application.Current.MainWindow;
-        if (dialog.ShowDialog() != true) return;
-
-        var name = dialog.SubName.Trim();
-        var rssUrl = dialog.RssUrl.Trim();
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(rssUrl) || !rssUrl.StartsWith("http"))
-            return;
-
-        var sub = new Subscription { Name = name, RssUrl = rssUrl, SaveSubfolder = name };
-        _owner.Config.Subscriptions.Add(sub);
-        _owner.Config.Save(_owner.ConfigPath);
-        Logger.Info($"添加订阅: {sub.Name}");
-        RefreshList();
     }
 
     private void DeleteSubscription()

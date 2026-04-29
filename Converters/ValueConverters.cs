@@ -7,15 +7,21 @@ namespace AnimeSubscriber.Converters;
 
 public class StatusToColorConverter : IValueConverter
 {
+    private static readonly SolidColorBrush CompletedBrush  = new((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#5db872"));
+    private static readonly SolidColorBrush DownloadingBrush = new((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#5db8a6"));
+    private static readonly SolidColorBrush WaitingBrush     = new((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#e8a55a"));
+    private static readonly SolidColorBrush FailedBrush      = new((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#c64545"));
+    private static readonly SolidColorBrush DefaultBrush     = new((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#141413"));
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         return value?.ToString() switch
         {
-            "Completed" => new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#5db872")),
-            "Downloading" => new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#5db8a6")),
-            "Waiting" => new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#e8a55a")),
-            "Failed" => new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#c64545")),
-            _ => new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#141413"))
+            "Completed" => CompletedBrush,
+            "Downloading" => DownloadingBrush,
+            "Waiting" => WaitingBrush,
+            "Failed" => FailedBrush,
+            _ => DefaultBrush
         };
     }
 

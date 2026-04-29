@@ -71,6 +71,22 @@ public class SettingsViewModel : BaseViewModel
 
     private async Task SaveSettings()
     {
+        if (string.IsNullOrWhiteSpace(QbHost))
+        {
+            System.Windows.MessageBox.Show("主机地址不能为空", "验证失败", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+        if (QbPort is < 1 or > 65535)
+        {
+            System.Windows.MessageBox.Show("端口必须在 1-65535 之间", "验证失败", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+        if (Interval < 1)
+        {
+            System.Windows.MessageBox.Show("检查间隔必须大于 0", "验证失败", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+
         _owner.Config.QBittorrent.Host = QbHost.Trim();
         _owner.Config.QBittorrent.Port = QbPort;
         _owner.Config.QBittorrent.Username = QbUser.Trim();

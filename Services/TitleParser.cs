@@ -1,10 +1,13 @@
 using System.Text.RegularExpressions;
 using AnimeSubscriber.Models;
+using AnimeSubscriber.Services.Abstractions;
 
 namespace AnimeSubscriber.Services;
 
-public static partial class TitleParser
+public partial class TitleParser : ITitleParser
 {
+    public static readonly TitleParser Instance = new();
+
     [GeneratedRegex(@"【(?<subgroup>[^】]+)】\s*\[(?<name>.+?)\]\s*\[(?<ep>\d+)\]")]
     private static partial Regex CBracketPattern();
 
@@ -36,7 +39,11 @@ public static partial class TitleParser
     private static readonly Regex SubgroupPattern =
         new(@"[\[【](?<subgroup>[^\[\]【】]+?)[\]】]", RegexOptions.Compiled);
 
-    public static ParsedTitle? Parse(string title)
+    public static ParsedTitle? Parse(string title) => Instance.ParseImpl(title);
+
+    ParsedTitle? ITitleParser.Parse(string title) => ParseImpl(title);
+
+    private ParsedTitle? ParseImpl(string title)
     {
         if (string.IsNullOrEmpty(title))
             return null;

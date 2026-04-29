@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using AnimeSubscriber.ViewModels;
 
@@ -14,5 +15,8 @@ public partial class SubscriptionsPage : UserControl
         ViewModel = new SubscriptionsViewModel(mainVm);
         DataContext = ViewModel;
         ViewModel.RefreshList();
+
+        mainVm.AutoCheckRequested += ViewModel.CheckAllAsync;
+        Unloaded += (_, _) => mainVm.AutoCheckRequested -= ViewModel.CheckAllAsync;
     }
 }

@@ -99,7 +99,7 @@
                             Height="32" Margin="6,0,0,0" Click="DeselectAll_Click"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button x:Name="ConfirmBtn" Content="确认下载 (0)" Style="{StaticResource CoralButton}"
+                    <Button x:Name="ConfirmBtn" Content="确认下载 (0)" Style="{StaticResource SuccessButton}"
                             Width="140" Height="32" Click="Confirm_Click"/>
                     <Button Content="取消" Style="{StaticResource SecondaryButton}"
                             Width="80" Height="32" Margin="6,0,0,0" IsCancel="True"/>

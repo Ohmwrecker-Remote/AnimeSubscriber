@@ -1,7 +1,6 @@
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using AnimeSubscriber.ViewModels;
 
 namespace AnimeSubscriber.Views;
@@ -9,6 +8,7 @@ namespace AnimeSubscriber.Views;
 public partial class DownloadsPage : UserControl
 {
     public DownloadsViewModel ViewModel { get; }
+    private string? _selectedHash;
 
     public DownloadsPage()
     {
@@ -16,30 +16,24 @@ public partial class DownloadsPage : UserControl
         var mainVm = ((App)Application.Current).MainViewModel;
         ViewModel = new DownloadsViewModel(mainVm);
         DataContext = ViewModel;
-    }
+        Unloaded += OnUnloaded;
 
-    private void OnDataGridMouseDown(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is not DataGrid dg) return;
-
-        var hit = dg.InputHitTest(e.GetPosition(dg));
-        var cell = FindParentDataGridCell(hit as DependencyObject);
-        if (cell == null) return;
-
-        var col = cell.Column;
-        if (col?.DisplayIndex != 0) return;
-
-        if (cell.DataContext is DownloadRow row && !string.IsNullOrEmpty(row.Hash))
-            row.IsSelected = !row.IsSelected;
-    }
-
-    private static DataGridCell? FindParentDataGridCell(DependencyObject? child)
-    {
-        while (child != null)
+        DownloadGrid.SelectionChanged += (_, _) =>
         {
-            if (child is DataGridCell cell) return cell;
-            child = VisualTreeHelper.GetParent(child);
-        }
-        return null;
+            if (DownloadGrid.SelectedItem is DownloadRow r && !string.IsNullOrEmpty(r.Hash))
+                _selectedHash = r.Hash;
+        };
+
+        ViewModel.Items.CollectionChanged += (_, _) =>
+        {
+            if (_selectedHash == null) return;
+            var match = ViewModel.Items.FirstOrDefault(r => r.Hash == _selectedHash);
+            if (match != null) DownloadGrid.SelectedItem = match;
+        };
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.StopDownloadPolling();
     }
 }

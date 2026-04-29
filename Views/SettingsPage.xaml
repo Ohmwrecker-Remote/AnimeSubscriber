@@ -53,8 +53,12 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Password" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}"/>
-                    <TextBox Grid.Column="1" Text="{Binding QbPass, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource ThemedTextBox}"/>
+                    <PasswordBox x:Name="QbPasswordBox" Grid.Column="1"
+                                 Height="30" Padding="8,4"
+                                 Background="{StaticResource BgInputBrush}"
+                                 BorderBrush="{StaticResource BorderLightBrush}"
+                                 BorderThickness="1"
+                                 PasswordChanged="OnPasswordChanged"/>
                 </Grid>
 
                 <Grid Margin="0,0,0,6">

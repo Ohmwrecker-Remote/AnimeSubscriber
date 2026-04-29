@@ -3,10 +3,11 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AnimeSubscriber.Models;
+using AnimeSubscriber.Services.Abstractions;
 
 namespace AnimeSubscriber.Services;
 
-public class QBitService : IDisposable
+public class QBitService : IQBitService
 {
     private readonly HttpClient _httpClient;
     private readonly string _baseUrl;
@@ -14,8 +15,8 @@ public class QBitService : IDisposable
 
     public bool IsConnected => _loggedIn;
 
-    public QBitService(string host = "localhost", int port = 8081,
-                        string username = "admin", string password = "123456")
+    public QBitService(string host = "localhost", int port = 8080,
+                        string username = "admin", string password = "Please Enter Password")
     {
         _baseUrl = $"http://{host}:{port}";
 
@@ -43,7 +44,7 @@ public class QBitService : IDisposable
     private readonly string _username;
     private readonly string _password;
 
-    public async Task ConnectAsync()
+    public async Task ConnectAsync(CancellationToken ct = default)
     {
         try
         {
@@ -53,9 +54,10 @@ public class QBitService : IDisposable
                 ["password"] = _password
             });
 
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var resp = await _httpClient.PostAsync($"{_baseUrl}/api/v2/auth/login", content, cts.Token);
-            var body = await resp.Content.ReadAsStringAsync(cts.Token);
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            timeoutCts.CancelAfter(TimeSpan.FromSeconds(5));
+            var resp = await _httpClient.PostAsync($"{_baseUrl}/api/v2/auth/login", content, timeoutCts.Token);
+            var body = await resp.Content.ReadAsStringAsync(timeoutCts.Token);
 
             _loggedIn = body == "Ok.";
             if (_loggedIn)
@@ -70,7 +72,7 @@ public class QBitService : IDisposable
         }
     }
 
-    public async Task<bool> AddTorrentAsync(string torrentUrl, string savePath, string category)
+    public async Task<bool> AddTorrentAsync(string torrentUrl, string savePath, string category, int retryCount = 1, CancellationToken ct = default)
     {
         if (!_loggedIn) return false;
 
@@ -91,26 +93,27 @@ public class QBitService : IDisposable
             };
             request.Headers.Referrer = new Uri(_baseUrl);
 
-            var resp = await _httpClient.SendAsync(request);
+            var resp = await _httpClient.SendAsync(request, ct);
             var ok = resp.StatusCode == HttpStatusCode.OK;
             if (!ok)
             {
-                var body = await resp.Content.ReadAsStringAsync();
+                var body = await resp.Content.ReadAsStringAsync(ct);
                 Logger.Warn($"添加种子失败 [{resp.StatusCode}]: {body[..Math.Min(200, body.Length)]} | url={torrentUrl[..Math.Min(80, torrentUrl.Length)]}");
 
-                if (resp.StatusCode == HttpStatusCode.Forbidden)
+                if (resp.StatusCode == HttpStatusCode.Forbidden && retryCount > 0)
                 {
                     Logger.Info("尝试重新登录 qBittorrent...");
-                    await ConnectAsync();
+                    await ConnectAsync(ct);
                     if (_loggedIn)
                     {
                         Logger.Info("重新登录成功，重试添加种子");
-                        return await AddTorrentAsync(torrentUrl, savePath, category);
+                        return await AddTorrentAsync(torrentUrl, savePath, category, retryCount - 1, ct);
                     }
                 }
             }
             return ok;
         }
+        catch (OperationCanceledException) { return false; }
         catch (Exception ex)
         {
             Logger.Error($"添加种子异常: url={torrentUrl[..Math.Min(80, torrentUrl.Length)]}", ex);
@@ -118,18 +121,18 @@ public class QBitService : IDisposable
         }
     }
 
-    public async Task<List<DownloadEntry>> GetTorrentsAsync()
+    public async Task<List<DownloadEntry>> GetTorrentsAsync(CancellationToken ct = default)
     {
         if (!_loggedIn) return new List<DownloadEntry>();
 
         try
         {
             var resp = await _httpClient.GetAsync(
-                $"{_baseUrl}/api/v2/torrents/info?category=anime");
+                $"{_baseUrl}/api/v2/torrents/info?category=anime", ct);
             if (resp.StatusCode != HttpStatusCode.OK)
                 return new List<DownloadEntry>();
 
-            var json = await resp.Content.ReadAsStringAsync();
+            var json = await resp.Content.ReadAsStringAsync(ct);
             var torrents = JsonSerializer.Deserialize<List<QBitTorrent>>(json);
 
             return torrents?.Select(t =>
@@ -149,6 +152,7 @@ public class QBitService : IDisposable
                 };
             }).ToList() ?? new List<DownloadEntry>();
         }
+        catch (OperationCanceledException) { return new List<DownloadEntry>(); }
         catch (Exception ex)
         {
             Logger.Error("获取种子列表失败", ex);
@@ -156,7 +160,7 @@ public class QBitService : IDisposable
         }
     }
 
-    public async Task<bool> DeleteTorrentsAsync(List<string> hashes, bool deleteFiles = true)
+    public async Task<bool> DeleteTorrentsAsync(List<string> hashes, bool deleteFiles = true, int retryCount = 1, CancellationToken ct = default)
     {
         if (!_loggedIn || hashes.Count == 0) return false;
 
@@ -169,22 +173,23 @@ public class QBitService : IDisposable
             });
 
             var resp = await _httpClient.PostAsync(
-                $"{_baseUrl}/api/v2/torrents/delete", content);
+                $"{_baseUrl}/api/v2/torrents/delete", content, ct);
 
             if (resp.StatusCode == HttpStatusCode.OK)
                 return true;
 
-            if (resp.StatusCode == HttpStatusCode.Forbidden)
+            if (resp.StatusCode == HttpStatusCode.Forbidden && retryCount > 0)
             {
                 Logger.Info("删除种子时鉴权失败，尝试重新登录...");
-                await ConnectAsync();
+                await ConnectAsync(ct);
                 if (_loggedIn)
-                    return await DeleteTorrentsAsync(hashes, deleteFiles);
+                    return await DeleteTorrentsAsync(hashes, deleteFiles, retryCount - 1, ct);
             }
 
             Logger.Warn($"删除种子失败 [{resp.StatusCode}]");
             return false;
         }
+        catch (OperationCanceledException) { return false; }
         catch (Exception ex)
         {
             Logger.Error($"删除种子异常: hashes={string.Join("|", hashes)}", ex);

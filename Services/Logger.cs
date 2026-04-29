@@ -41,7 +41,10 @@ public static class Logger
 
             _writer = new StreamWriter(LogFile, append: true) { AutoFlush = false };
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Logger init failed: {ex.Message}");
+        }
     }
 
     private static async Task WriteLoopAsync()
@@ -69,7 +72,10 @@ public static class Logger
             }
         }
         catch (OperationCanceledException) { }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Logger write loop error: {ex.Message}");
+        }
         finally
         {
             try { _writer?.Dispose(); } catch { }
@@ -95,7 +101,10 @@ public static class Logger
     {
         _channel.Writer.Complete();
         try { await _writerTask.WaitAsync(TimeSpan.FromSeconds(3)); }
-        catch { }
+        catch (TimeoutException)
+        {
+            System.Diagnostics.Debug.WriteLine("Logger flush timed out after 3s");
+        }
     }
 
     public static string GetLogPath() => LogFile;

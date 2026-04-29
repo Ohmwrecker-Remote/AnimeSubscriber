@@ -2,12 +2,13 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Xml.Linq;
+using System.Xml;
 using AnimeSubscriber.Models;
+using AnimeSubscriber.Services.Abstractions;
 
 namespace AnimeSubscriber.Services;
 
-public class RssService : IDisposable
+public class RssService : IRssService
 {
     private readonly HttpClient _httpClient;
     private readonly string? _proxy;
@@ -43,13 +44,13 @@ public class RssService : IDisposable
             Logger.Warn("curl 未找到，将仅使用 HttpClient");
     }
 
-    public async Task<List<RssItem>> FetchAsync(string rssUrl)
+    public async Task<List<RssItem>> FetchAsync(string rssUrl, CancellationToken ct = default)
     {
         string xml;
 
         try
         {
-            xml = await _httpClient.GetStringAsync(rssUrl);
+            xml = await _httpClient.GetStringAsync(rssUrl, ct);
             Logger.Info($"RSS 抓取成功 (HttpClient): {rssUrl[..Math.Min(80, rssUrl.Length)]}, 大小={xml.Length}");
         }
         catch (Exception ex1)
@@ -117,30 +118,72 @@ public class RssService : IDisposable
     private static List<RssItem> ParseRss(string xml)
     {
         var items = new List<RssItem>();
-        var doc = XDocument.Parse(xml);
-        var ns = doc.Root?.GetDefaultNamespace() ?? XNamespace.None;
 
-        foreach (var el in doc.Descendants(ns + "item"))
+        using var sr = new StringReader(xml);
+        using var reader = System.Xml.XmlReader.Create(sr, new System.Xml.XmlReaderSettings
         {
-            var item = new RssItem
-            {
-                Title = el.Element(ns + "title")?.Value ?? "",
-                Guid = el.Element(ns + "guid")?.Value ?? "",
-            };
+            IgnoreWhitespace = true,
+            IgnoreComments = true,
+            DtdProcessing = System.Xml.DtdProcessing.Ignore
+        });
 
-            var enclosure = el.Element(ns + "enclosure");
-            if (enclosure != null)
-                item.TorrentUrl = enclosure.Attribute("url")?.Value ?? "";
+        var ns = string.Empty;
+        string? currentElement = null;
+        RssItem? currentItem = null;
 
-            if (string.IsNullOrEmpty(item.TorrentUrl))
+        while (reader.Read())
+        {
+            switch (reader.NodeType)
             {
-                var linkEl = el.Element(ns + "link");
-                if (linkEl != null)
-                    item.TorrentUrl = linkEl.Value;
+                case System.Xml.XmlNodeType.Element:
+                    if (reader.LocalName == "item")
+                    {
+                        currentItem = new RssItem();
+                    }
+                    else if (currentItem != null)
+                    {
+                        currentElement = reader.LocalName;
+                    }
+                    else if (reader.LocalName == "rss" || reader.LocalName == "channel")
+                    {
+                        ns = reader.NamespaceURI;
+                    }
+
+                    // enclosure: extract url attribute
+                    if (currentItem != null && reader.LocalName == "enclosure")
+                    {
+                        var url = reader.GetAttribute("url");
+                        if (!string.IsNullOrEmpty(url))
+                            currentItem.TorrentUrl = url;
+                    }
+                    break;
+
+                case System.Xml.XmlNodeType.Text:
+                    if (currentItem != null && currentElement != null)
+                    {
+                        var value = reader.Value;
+                        switch (currentElement)
+                        {
+                            case "title": currentItem.Title = value; break;
+                            case "guid": currentItem.Guid = value; break;
+                            case "link":
+                                if (string.IsNullOrEmpty(currentItem.TorrentUrl))
+                                    currentItem.TorrentUrl = value;
+                                break;
+                        }
+                    }
+                    break;
+
+                case System.Xml.XmlNodeType.EndElement:
+                    if (reader.LocalName == "item" && currentItem != null)
+                    {
+                        if (!string.IsNullOrEmpty(currentItem.Title))
+                            items.Add(currentItem);
+                        currentItem = null;
+                    }
+                    currentElement = null;
+                    break;
             }
-
-            if (!string.IsNullOrEmpty(item.Title))
-                items.Add(item);
         }
 
         return items;

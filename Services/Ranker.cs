@@ -1,12 +1,26 @@
 using AnimeSubscriber.Models;
+using AnimeSubscriber.Services.Abstractions;
 
 namespace AnimeSubscriber.Services;
 
-public static class Ranker
+public class Ranker : IRanker
 {
-    public static (RssItem Item, ParsedTitle Parsed) PickBest(
-        List<(RssItem Item, ParsedTitle Parsed)> entries)
+    public static readonly Ranker Instance = new();
+
+    // Configurable via App.xaml.cs DI setup
+    public bool PreferCHS { get; set; } = true;
+    public bool PreferMKV { get; set; } = true;
+    public bool PreferHEVC { get; set; } = true;
+
+    public static (RssItem Item, ParsedTitle Parsed)? PickBest(
+        List<(RssItem Item, ParsedTitle Parsed)> entries) => Instance.PickBestImpl(entries);
+
+    (RssItem, ParsedTitle)? IRanker.PickBest(List<(RssItem, ParsedTitle)> entries) => PickBestImpl(entries);
+
+    private (RssItem Item, ParsedTitle Parsed)? PickBestImpl(List<(RssItem Item, ParsedTitle Parsed)> entries)
     {
+        if (entries.Count == 0)
+            return null;
         if (entries.Count == 1)
             return entries[0];
 
@@ -30,13 +44,15 @@ public static class Ranker
             _ => 0
         };
 
-        if (t.Contains("chs") || t.Contains("ch_s") || t.Contains("简中") || t.Contains("简体"))
+        if (Instance.PreferCHS &&
+            (t.Contains("chs") || t.Contains("ch_s") || t.Contains("简中") || t.Contains("简体")))
             score += 10;
 
-        if (t.Contains(".mkv"))
+        if (Instance.PreferMKV && t.Contains(".mkv"))
             score += 5;
 
-        if (t.Contains("hevc") || t.Contains("x265") || t.Contains("h265"))
+        if (Instance.PreferHEVC &&
+            (t.Contains("hevc") || t.Contains("x265") || t.Contains("h265")))
             score += 3;
 
         return score;

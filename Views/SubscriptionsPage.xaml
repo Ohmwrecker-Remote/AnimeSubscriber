@@ -2,7 +2,12 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:AnimeSubscriber.ViewModels"
+             xmlns:conv="clr-namespace:AnimeSubscriber.Converters"
              Background="{StaticResource BgPrimaryBrush}">
+
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
 
     <Border Style="{StaticResource CardPanel}" Margin="16">
         <Grid>
@@ -23,10 +28,14 @@
                                    FontSize="{StaticResource SmallFontSize}"
                                    Foreground="{StaticResource TextMutedBrush}" Margin="0,2,0,0"/>
                     </StackPanel>
-                    <Button Content="🔄 检查更新" Style="{StaticResource SuccessButton}"
-                            Command="{Binding CheckNowCommand}"
-                            IsEnabled="{Binding IsNotLoading}"
-                            HorizontalAlignment="Right" VerticalAlignment="Center" Width="120"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBlock Text="检查中..." Foreground="{StaticResource CoralBrush}"
+                                   Visibility="{Binding Loading, Converter={StaticResource BoolToVis}}"
+                                   VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <Button Content="🔄 检查更新" Style="{StaticResource SuccessButton}"
+                                Command="{Binding CheckNowCommand}"
+                                IsEnabled="{Binding IsNotLoading}" Width="120"/>
+                    </StackPanel>
                 </Grid>
             </Border>
 
@@ -34,7 +43,6 @@
             <Grid Grid.Row="1" Margin="0,8,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Column="0" Text="{Binding RssUrl, UpdateSourceTrigger=PropertyChanged}"
@@ -45,6 +53,23 @@
                         Command="{Binding AddRssCommand}" Margin="6,0,0,0"
                         IsEnabled="{Binding IsNotLoading}" Width="90"/>
             </Grid>
+
+            <!-- Empty state hint -->
+            <TextBlock Grid.Row="2" Text="还没有订阅，在上方输入 RSS 链接开始添加"
+                       Foreground="{StaticResource TextMutedBrush}"
+                       FontSize="{StaticResource NormalFontSize}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Visibility="Collapsed">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Subs.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
 
             <!-- Subscription list -->
             <ListBox Grid.Row="2" ItemsSource="{Binding Subs}"
@@ -61,16 +86,9 @@
 
             <!-- Bottom buttons -->
             <Grid Grid.Row="3" Margin="0,8,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="✏ 手动添加" Style="{StaticResource CoralButton}"
-                        Command="{Binding AddManualCommand}" Margin="0,0,4,0"
-                        IsEnabled="{Binding IsNotLoading}"/>
-                <Button Grid.Column="1" Content="🗑 删除选中" Style="{StaticResource DangerButton}"
-                        Command="{Binding DeleteCommand}" Margin="4,0,0,0"
-                        IsEnabled="{Binding CanDelete}"/>
+                <Button Content="🗑 删除选中" Style="{StaticResource DangerButton}"
+                        Command="{Binding DeleteCommand}"
+                        IsEnabled="{Binding CanDelete}" Width="120"/>
             </Grid>
         </Grid>
     </Border>

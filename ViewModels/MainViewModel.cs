@@ -1,6 +1,7 @@
 using System.Windows.Input;
-using AnimeSubscriber.Config;
+using Microsoft.Extensions.DependencyInjection;
 using AnimeSubscriber.Services;
+using AnimeSubscriber.Services.Abstractions;
 
 namespace AnimeSubscriber.ViewModels;
 
@@ -22,9 +23,9 @@ public class MainViewModel : BaseViewModel
     public ICommand NavCommand { get; }
 
     // ── Shared services ──
-    public AppConfig Config { get; }
-    public QBitService QBit { get; private set; }
-    public RssService Rss { get; private set; }
+    public IConfigService Config { get; }
+    public IQBitService QBit { get; private set; }
+    public IRssService Rss { get; private set; }
 
     // ── Shared state ──
     private bool _isConnected;
@@ -62,18 +63,30 @@ public class MainViewModel : BaseViewModel
         set => Set(ref _sidebarStatusColor, value);
     }
 
-    public string ConfigPath { get; private set; } = "";
+    public string ConfigPath => Config.ConfigPath;
+
+    private string _errorMessage = "";
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set => Set(ref _errorMessage, value);
+    }
+
+    public void ShowError(string message)
+    {
+        ErrorMessage = message;
+        _ = Task.Delay(5000).ContinueWith(_ =>
+            Application.Current.Dispatcher.Invoke(() => ErrorMessage = ""));
+    }
 
     public event Action? StatusBarUpdated;
+    public Func<Task>? AutoCheckRequested;
 
-    public MainViewModel(AppConfig config, string configPath)
+    public MainViewModel(IConfigService config, IQBitService qBit, IRssService rss)
     {
         Config = config;
-        ConfigPath = configPath;
-
-        var qb = config.QBittorrent;
-        QBit = new QBitService(qb.Host, qb.Port, qb.Username, qb.Password);
-        Rss = new RssService(string.IsNullOrEmpty(config.Settings.Proxy) ? null : config.Settings.Proxy);
+        QBit = qBit;
+        Rss = rss;
 
         NavCommand = new RelayCommand<string>(page =>
         {
@@ -109,7 +122,7 @@ public class MainViewModel : BaseViewModel
     public void RecreateRss(string? proxy)
     {
         Rss.Dispose();
-        Rss = new RssService(string.IsNullOrEmpty(proxy) ? null : proxy);
+        Rss = new Services.RssService(string.IsNullOrEmpty(proxy) ? null : proxy);
     }
 
     public async Task ConnectQBitAsync()

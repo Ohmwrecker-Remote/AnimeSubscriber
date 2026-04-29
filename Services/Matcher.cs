@@ -1,10 +1,17 @@
 using AnimeSubscriber.Models;
+using AnimeSubscriber.Services.Abstractions;
 
 namespace AnimeSubscriber.Services;
 
-public static class Matcher
+public class Matcher : IMatcher
 {
-    public static bool Match(Subscription sub, ParsedTitle parsed)
+    public static readonly Matcher Instance = new();
+
+    public static bool Match(Subscription sub, ParsedTitle parsed) => Instance.MatchImpl(sub, parsed);
+
+    bool IMatcher.Match(Subscription sub, ParsedTitle parsed) => MatchImpl(sub, parsed);
+
+    private bool MatchImpl(Subscription sub, ParsedTitle parsed)
     {
         if (sub.IncludeGroups.Count > 0)
         {

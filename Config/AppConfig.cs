@@ -1,10 +1,11 @@
 using System.IO;
 using System.Text.Json;
 using AnimeSubscriber.Models;
+using AnimeSubscriber.Services.Abstractions;
 
 namespace AnimeSubscriber.Config;
 
-public class AppConfig
+public class AppConfig : IConfigService
 {
     private static readonly JsonSerializerOptions _options = new()
     {
@@ -14,8 +15,10 @@ public class AppConfig
     };
 
     public QBitConfig QBittorrent { get; set; } = new();
+    public DownloaderConfig Downloader { get; set; } = new();
     public SettingsConfig Settings { get; set; } = new();
     public List<Subscription> Subscriptions { get; set; } = new();
+    public string ConfigPath { get; set; } = "";
 
     // ── Sync (kept for compatibility) ──────────────────────────
 
@@ -71,6 +74,14 @@ public class QBitConfig
     public string Password { get; set; } = "Please Enter Password";
     public string SavePath { get; set; } = "Choose Your Savepath";
     public string Category { get; set; } = "anime";
+}
+
+public class DownloaderConfig
+{
+    public int ConcurrencyLimit { get; set; } = 3;
+    public bool PreferCHS { get; set; } = true;
+    public bool PreferMKV { get; set; } = true;
+    public bool PreferHEVC { get; set; } = true;
 }
 
 public class SettingsConfig

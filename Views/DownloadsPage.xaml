@@ -25,6 +25,9 @@
                         <TextBlock Text="📥 下载状态" FontSize="{StaticResource TitleFontSize}" FontWeight="Bold"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="刷新中..." Foreground="{StaticResource CoralBrush}"
+                                   Visibility="{Binding Loading, Converter={StaticResource BoolToVis}}"
+                                   VerticalAlignment="Center" Margin="0,0,8,0"/>
                         <Button Content="🗑 删除选中" Style="{StaticResource SecondaryButton}"
                                 Command="{Binding DeleteSelectedCommand}" Margin="0,0,6,0"/>
                         <Button Content="🔄 刷新" Style="{StaticResource SuccessButton}"
@@ -34,14 +37,13 @@
             </Border>
 
             <!-- Download DataGrid -->
-            <DataGrid Grid.Row="1" ItemsSource="{Binding Items}"
+            <DataGrid x:Name="DownloadGrid" Grid.Row="1" ItemsSource="{Binding Items}"
                       AutoGenerateColumns="False" HeadersVisibility="Column"
                       GridLinesVisibility="None" Background="Transparent"
                       BorderThickness="0" RowHeight="36"
                       CanUserAddRows="False" CanUserDeleteRows="False"
                       CanUserResizeRows="False" IsReadOnly="False"
-                      Margin="-8,4,-8,0"
-                      PreviewMouseLeftButtonDown="OnDataGridMouseDown">
+                      Margin="-8,4,-8,0">
                 <DataGrid.Resources>
                     <Style x:Key="CenterTextStyle" TargetType="TextBlock">
                         <Setter Property="TextAlignment" Value="Center"/>
@@ -49,6 +51,14 @@
                     </Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="TextAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="Background" Value="{StaticResource BorderLightBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                     <Style TargetType="DataGridColumnHeader">
                         <Setter Property="Background" Value="{StaticResource BgSecondaryBrush}"/>
@@ -67,8 +77,22 @@
                     </Style>
                 </DataGrid.Resources>
 
+                <DataGrid.InputBindings>
+                    <KeyBinding Key="Delete" Command="{Binding DeleteKeyCommand}"/>
+                    <KeyBinding Key="Space" Command="{Binding ToggleRowCommand}"
+                                CommandParameter="{Binding SelectedItem, ElementName=DownloadGrid}"/>
+                </DataGrid.InputBindings>
+
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="选择" Width="60">
+                    <DataGridTemplateColumn Width="60">
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <CheckBox Command="{Binding DataContext.SelectAllCommand,
+                                    RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    IsThreeState="False"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

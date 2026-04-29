@@ -1,8 +1,6 @@
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using AnimeSubscriber.Config;
 using AnimeSubscriber.Services;
 using AnimeSubscriber.ViewModels;
 
@@ -11,26 +9,22 @@ namespace AnimeSubscriber;
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _vm;
-    private readonly string _configPath;
-    private System.Timers.Timer? _autoTimer;
+    private CancellationTokenSource? _timerCts;
 
-    public MainWindow()
+    public MainWindow(MainViewModel vm)
     {
-        _configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
-        var config = AppConfig.Load(_configPath);
-
-        _vm = new MainViewModel(config, _configPath);
+        _vm = vm;
         _vm.StatusBarUpdated += UpdateStatusBar;
         DataContext = _vm;
 
         InitializeComponent();
 
-        // Wire nav button styles
         WireNavButtons();
 
         Loaded += async (_, _) =>
         {
             Logger.Info("应用启动");
+            NotificationService.Init();
             await _vm.ConnectQBitAsync();
             UpdateSidebarStatus();
             UpdateStatusBar();
@@ -40,10 +34,11 @@ public partial class MainWindow : Window
         Closing += async (_, _) =>
         {
             Logger.Info("应用关闭");
-            _autoTimer?.Dispose();
+            _timerCts?.Cancel();
             _vm.QBit.Dispose();
             _vm.Rss.Dispose();
             await Logger.FlushAndStopAsync();
+            NotificationService.Dispose();
         };
 
         _vm.PropertyChanged += (_, e) =>
@@ -88,20 +83,23 @@ public partial class MainWindow : Window
 
     public void StartAutoTimer()
     {
-        _autoTimer?.Dispose();
+        _timerCts?.Cancel();
+        _timerCts = new CancellationTokenSource();
+        var ct = _timerCts.Token;
         var settings = _vm.Config.Settings;
-        _autoTimer = new System.Timers.Timer(settings.RssIntervalMinutes * 60 * 1000);
-        _autoTimer.Elapsed += async (_, _) =>
+
+        _ = Task.Run(async () =>
         {
-            await Dispatcher.InvokeAsync(async () =>
+            using var timer = new PeriodicTimer(TimeSpan.FromMinutes(settings.RssIntervalMinutes));
+            while (await timer.WaitForNextTickAsync(ct))
             {
-                var subPage = FindVisualChild<AnimeSubscriber.Views.SubscriptionsPage>(this);
-                if (subPage?.ViewModel != null)
-                    await subPage.ViewModel.CheckAllAsync();
-            });
-        };
-        _autoTimer.AutoReset = true;
-        _autoTimer.Start();
+                await Dispatcher.InvokeAsync(async () =>
+                {
+                    if (_vm.AutoCheckRequested != null)
+                        await _vm.AutoCheckRequested.Invoke();
+                });
+            }
+        }, ct);
 
         _vm.NextCheckText = $"下次检查: {DateTime.Now.AddMinutes(settings.RssIntervalMinutes):HH:mm}";
     }

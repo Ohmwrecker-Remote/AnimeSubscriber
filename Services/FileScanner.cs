@@ -1,23 +1,35 @@
 using System.IO;
 using AnimeSubscriber.Models;
+using AnimeSubscriber.Services.Abstractions;
 
 namespace AnimeSubscriber.Services;
 
-public static class FileScanner
+public class FileScanner : IFileScanner
 {
-    public static bool EpisodeExists(string savePath, int episode)
+    public static readonly FileScanner Instance = new();
+
+    public static bool EpisodeExists(string savePath, int episode) =>
+        Instance.EpisodeExistsImpl(savePath, episode);
+
+    public static DownloadStatus GetEpisodeStatus(string savePath, int episode) =>
+        Instance.GetEpisodeStatusImpl(savePath, episode);
+
+    bool IFileScanner.EpisodeExists(string savePath, int episode) =>
+        EpisodeExistsImpl(savePath, episode);
+
+    DownloadStatus IFileScanner.GetEpisodeStatus(string savePath, int episode) =>
+        GetEpisodeStatusImpl(savePath, episode);
+
+    private bool EpisodeExistsImpl(string savePath, int episode)
     {
         if (!Directory.Exists(savePath))
             return false;
 
         var epPatterns = new[]
         {
-            $"{episode:D2}",
-            $"{episode:D3}",
-            $"第{episode}话",
-            $"第{episode}集",
-            $"E{episode:D2}",
-            $"S01E{episode:D2}"
+            $"{episode:D2}", $"{episode:D3}",
+            $"第{episode}话", $"第{episode}集",
+            $"E{episode:D2}", $"S01E{episode:D2}"
         };
 
         try
@@ -36,20 +48,20 @@ public static class FileScanner
                     return true;
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // 目录无法访问，返回 false
+            Logger.Warn($"文件扫描失败: {savePath} E{episode:D2} | {ex.GetType().Name}: {ex.Message}");
         }
 
         return false;
     }
 
-    public static DownloadStatus GetEpisodeStatus(string savePath, int episode)
+    private DownloadStatus GetEpisodeStatusImpl(string savePath, int episode)
     {
         if (!Directory.Exists(savePath))
             return DownloadStatus.Waiting;
 
-        if (EpisodeExists(savePath, episode))
+        if (EpisodeExistsImpl(savePath, episode))
             return DownloadStatus.Completed;
 
         try
@@ -59,7 +71,10 @@ public static class FileScanner
             if (partFiles.Any(f => f.Contains(epStr)))
                 return DownloadStatus.Downloading;
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Logger.Warn($"部分下载检测失败: {savePath} E{episode:D2} | {ex.GetType().Name}: {ex.Message}");
+        }
 
         return DownloadStatus.Waiting;
     }
